@@ -48,13 +48,13 @@ describe('Testing auth-router', function(){
         .catch(done);
       });
 
-      it('Should return a 401 error', (done) => {
+      it('Should return a 400 error', (done) => {
         request.post(`${url}/api/signup`)
         .set('Content-type', 'application/json')
         .send('{')
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(!!res.text).to.equal(true);
+          expect(res.text).to.equal('SyntaxError');
           done();
         });
       });
