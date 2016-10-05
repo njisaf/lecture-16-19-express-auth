@@ -1,6 +1,6 @@
 'use strict';
 
-const jwt = require('jwt');
+const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
 const debug = require('debug')('cuttlefish:bearer-auth-middleware');
 
