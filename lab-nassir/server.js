@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const Promise = require('bluebird');
 const debug = require('debug')('cuttlefish:server');
 
+const picRouter = require('./route/pic-router');
 const authRouter = require('./route/auth-router');
 const galleryRouter = require('./route/gallery-router');
 const errorMiddleware = require('./lib/error-middleware');
@@ -23,6 +24,7 @@ const app = express();
 app.use(cors());
 app.use(morgan('dev'));
 
+app.use(picRouter);
 app.use(authRouter);
 app.use(galleryRouter);
 app.use(errorMiddleware);
