@@ -9,6 +9,7 @@ const Promise = require('bluebird');
 const debug = require('debug')('cuttlefish:server');
 
 const authRouter = require('./route/auth-router');
+const galleryRouter = require('./router/gallery-router');
 const errorMiddleware = require('./lib/error-middleware');
 
 dotenv.load();
@@ -23,6 +24,7 @@ app.use(cors());
 app.use(morgan('dev'));
 
 app.use(authRouter);
+app.use(galleryRouter);
 app.use(errorMiddleware);
 
 const server = module.exports = app.listen(PORT, () => {
