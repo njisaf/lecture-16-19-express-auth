@@ -5,6 +5,7 @@ const fs = require('fs');
 
 const AWS = require('aws-sdk');
 const multer = require('multer');
+const jsonParser = require('body-parser').json();
 const createError = require('http-errors');
 const debug = require('debug')('cuttlefish:pic-router');
 
@@ -67,11 +68,25 @@ picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req,
 
     return s3.deleteObject(params).promise();
   })
-  .catch(err => Promise.reject(createError(500, err.message)))
+  .catch(err => err.status ? Promise.reject(err) : Promise.reject(createError(500, err.message)))
   .then(s3Data => {
     console.log('s3Data:   ', s3Data);
     return Pic.findByIdAndRemove(req.params.picID);
   })
   .then(() => res.sendStatus(204))
   .catch(next);
+});
+
+picRouter.put('/api/gallery/:galleryID/pic/:picID', bearerAuth, jsonParser, function(req, res, next) {
+  debug('Hit PUT //api/gallery/:galleryID/pic/:picID');
+  Pic.findById(req.params.picID)
+  .then(pic => {
+    if(pic.userID.toString() === req.user._id.toString()) {
+      Pic.findByIdAndUpdate(req.params.picID, req.body, {new:true})
+      .then(pic => res.json(pic));
+    } else {
+      return Promise.reject(createError(401, 'invalid user ID. not authorized to modify Property'));
+    }
+  })
+.catch(err => err.status ? next(err) : next(createError(404, err.message)));
 });
