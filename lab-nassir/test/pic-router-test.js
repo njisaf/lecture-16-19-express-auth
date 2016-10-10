@@ -6,6 +6,7 @@ const debug = require('debug')('cuttlefish:pic-router-test');
 const Promise = require('bluebird');
 
 const formRequest = require('./lib/form-request');
+const Pic = require('../model/pic');
 const Gallery = require('../model/gallery');
 const User = require('../model/user');
 
@@ -103,7 +104,7 @@ describe('Testing pic router', function() {
 
 
       it('Should return a pic', done => {
-        formRequest(`${url}/api/gallery/${this.tempgallery._id}/pic`, this.temptoken, examplePic)
+        formRequest(`${url}/api/gallery/${this.tempgallery._id}/pic`, examplePic)
         .then(res => {
           console.log('should be pic', res.body);
           expect(res.statusCode).to.equal(200);
@@ -119,43 +120,60 @@ describe('Testing pic router', function() {
     });
   });
 
-  describe('Testing DELETE /api/gallery/:galleryId/pic/:picID', function() {
-    describe('With VALID PIC ID and VALID GALLERY ID', function() {
-
-      before(done => {
-        debug('Creating tempuser and temptoken');
-        new User(exampleUser).generatePasswordHash(exampleUser.password)
-        .then(user => user.save())
-        .then(user => {
-          this.tempuser = user;
-          return user.generateToken();
-        })
-        .then(token => {
-          this.temptoken = token;
-          done();
-        })
-        .catch(done);
-      });
-
-      before(done => {
-        debug('Creating tempgallery');
-        exampleGallery.userID = this.tempuser._id.toString();
-        new Gallery(exampleGallery).save()
-        .then(gallery => {
-          this.tempgallery = gallery;
-          done();
-        })
-        .catch(done);
-      });
-
-      after(() => {
-        debug('Cleaning exampleGallery');
-        delete exampleGallery.userID;
-      });
-
-      it('Should return a 204 status code', done => {
-        formRequest(`${url}/api/gallery/${this.tempgallery._id}/pic`, this.temptoken
-      })
-    });
-  });
+  // describe('Testing DELETE /api/gallery/:galleryId/pic/:picID', function() {
+  //   describe('With VALID PIC ID and VALID GALLERY ID', function() {
+  //
+  //     before(done => {
+  //       debug('Creating tempuser and temptoken');
+  //       new User(exampleUser).generatePasswordHash(exampleUser.password)
+  //       .then(user => user.save())
+  //       .then(user => {
+  //         this.tempuser = user;
+  //         return user.generateToken();
+  //       })
+  //       .then(token => {
+  //         this.temptoken = token;
+  //         done();
+  //       })
+  //       .catch(done);
+  //     });
+  //
+  //     before(done => {
+  //       debug('Creating tempgallery');
+  //       exampleGallery.userID = this.tempuser._id.toString();
+  //       new Gallery(exampleGallery).save()
+  //       .then(gallery => {
+  //         this.tempgallery = gallery;
+  //         done();
+  //       })
+  //       .catch(done);
+  //     });
+  //
+  //     before(done => {
+  //       debug('Creating temppic');
+  //       examplePic.galleryID = this.tempgallery._id.toString();
+  //       formRequest(`${url}/api/gallery/${this.tempgallery._id}/pic`, examplePic)
+  //       .then(pic => {
+  //         console.log('HERHEHREHRHERH', pic);
+  //         this.temppic = pic;
+  //         done();
+  //       })
+  //       .catch(done);
+  //     });
+  //
+  //     after(() => {
+  //       debug('Cleaning exampleGallery');
+  //       delete exampleGallery.userID;
+  //     });
+  //
+  //     it('Should return a 204 status code', done => {
+  //       formRequest(`${url}/api/gallery/${this.tempgallery._id}/pic/${this.temppic._id}`, examplePic)
+  //       .then(res => {
+  //         expect(res.statusCode).to.equal(204);
+  //         done();
+  //       })
+  //       .catch(done);
+  //     });
+  //   });
+  // });
 });

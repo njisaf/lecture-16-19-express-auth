@@ -11,4 +11,5 @@ const gallerySchema = Schema({
   userID: {type: mongoose.Schema.Types.ObjectId, required: true},
 });
 
+
 module.exports = mongoose.model('gallery', gallerySchema);
