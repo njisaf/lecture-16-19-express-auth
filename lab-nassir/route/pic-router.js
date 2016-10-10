@@ -8,7 +8,7 @@ const multer = require('multer');
 const createError = require('http-errors');
 const debug = require('debug')('cuttlefish:pic-router');
 
-const User = require('../model/user');
+const bearerAuth = require('../lib/bearer-auth-middleware');
 const Pic = require('../model/pic');
 const Gallery = require('../model/gallery');
 
@@ -49,20 +49,29 @@ picRouter.post('/api/gallery/:galleryID/pic', upload.single('image'), function(r
   });
 });
 
-picRouter.delete('/api/gallery/:galleryID/pic/:picID', function(req, res, next) {
+picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req, res, next) {
   debug('Hit DELETE /api/gallery/:galleryID/pic/:picID');
 
   Pic.findById(req.params.picID)
+  .catch(err => Promise.reject(createError(404, err.message)))
   .then(pic => {
-    console.log('pic', pic);
+    if(pic.galleryID.toString() !== req.params.galleryID)
+      return Promise.reject(createError(400, 'Bad request! Wrong gallery.'));
+    if(pic.userID.toString() !== req.user._id.toString())
+      return Promise.reject(createError(401, 'Bad request! User not authorized.'));
+
+    let params = {
+      Bucket: 'octopus-cuttlefish',
+      Key: pic.objectKey,
+    };
+
+    return s3.deleteObject(params).promise();
   })
+  .catch(err => Promise.reject(createError(500, err.message)))
+  .then(s3Data => {
+    console.log('s3Data:   ', s3Data);
+    return Pic.findByIdAndRemove(req.params.picID);
+  })
+  .then(() => res.sendStatus(204))
   .catch(next);
-  // let ext = path.extname(req.file.originalname);
-  //
-  // let params = {
-  //   Bucket: 'octopus-cuttlefish',
-  //   Key: `${req.file.filename}${ext}`,
-  // };
-  //
-  // s3.deleteObject
 });

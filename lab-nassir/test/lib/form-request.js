@@ -4,7 +4,7 @@ const FormData = require('form-data');
 const Promise = require('bluebird');
 const debug = require('debug')('cuttlefish:form-request');
 
-module.exports = function(url, token, params) {
+module.exports = function(url, params) {
   debug('form-request');
   return new Promise((resolve, reject) => {
     let form = new FormData();
