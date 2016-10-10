@@ -1,7 +1,7 @@
 # my shit
 
 db
-data
+data/
 .env
 
 # Created by https://www.gitignore.io/api/o,vim,linux,windows,node
